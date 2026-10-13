@@ -1,0 +1,17 @@
+window.TRAVEL_PULSE_SEED = {
+  schemaVersion: 2,
+  properties: [
+    {
+      id: "my-hotel",
+      name: "我的酒店",
+      kind: "hotel",
+      city: "",
+      aliases: [],
+      owners: ["值班经理", "前厅部", "客房部", "餐饮部", "工程部", "市场运营"],
+      slaHours: { 红色: 1, 橙色: 2, 黄色: 24 },
+    },
+  ],
+  records: [],
+  batches: [],
+  channels: [],
+};

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>旅声 · 酒旅舆情监测与预警系统</title>
+    <link rel="icon" href="assets/brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <a class="brand" href="#overview"
+        ><img src="assets/brand.svg" alt="" /><span
+          >旅声<small>酒旅舆情工作台</small></span
+        ></a
+      >
+      <nav aria-label="工作台导航">
+        <button data-view="overview" class="nav active">
+          <i data-lucide="layout-dashboard"></i>整体概览
+        </button>
+        <button data-view="feedback" class="nav">
+          <i data-lucide="messages-square"></i>反馈与预警<span id="navCount"
+            >0</span
+          >
+        </button>
+        <button data-view="coverage" class="nav">
+          <i data-lucide="radio"></i>数据来源
+        </button>
+        <button data-view="settings" class="nav">
+          <i data-lucide="building-2"></i>监测对象
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="dot"></span>本地工作空间<small id="saveStatus"
+          >处置记录保存在此浏览器</small
+        >
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="property-control">
+          <i data-lucide="building-2"></i
+          ><select id="propertyFilter" aria-label="监测对象"></select>
+        </div>
+        <div class="top-actions">
+          <span id="clockLabel"></span
+          ><button
+            class="icon-button"
+            id="importBtn"
+            title="导入数据"
+            aria-label="导入数据"
+          >
+            <i data-lucide="upload"></i></button
+          ><button
+            class="icon-button"
+            id="backupBtn"
+            title="备份工作空间"
+            aria-label="备份工作空间"
+          >
+            <i data-lucide="download"></i>
+          </button>
+        </div>
+      </header>
+      <main>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow" id="propertyKind">酒旅运营</p>
+            <h1 id="pageTitle">整体概览</h1>
+            <p id="pageSubtitle" class="muted"></p>
+          </div>
+          <div class="range-control">
+            <label for="rangeFilter">统计范围</label
+            ><select id="rangeFilter">
+              <option value="all">全部历史</option>
+              <option value="today">今天</option>
+              <option value="24h">最近24小时</option>
+              <option value="7d">最近7天</option>
+              <option value="30d">最近30天</option>
+            </select>
+          </div>
+        </div>
+        <div class="coverage-notice" id="freshness" role="status"></div>
+        <section data-section="overview">
+          <div class="stats-grid" id="stats"></div>
+          <div class="section-heading">
+            <h2>平台反馈</h2>
+            <button class="text-button" data-go="coverage">
+              查看来源<i data-lucide="arrow-up-right"></i>
+            </button>
+          </div>
+          <div class="platform-grid" id="platforms"></div>
+          <div class="analysis-grid">
+            <section class="analysis">
+              <div class="section-heading">
+                <h2>风险主题</h2>
+                <span class="muted small">负面及风险线索</span>
+              </div>
+              <div id="topics"></div>
+            </section>
+            <section class="analysis">
+              <div class="section-heading">
+                <h2>最近24小时反馈</h2>
+                <span class="muted small">按发布时间 · 北京时间</span>
+              </div>
+              <div id="hourChart" class="hour-chart" role="img"></div>
+              <div class="chart-labels" id="hourLabels"></div>
+            </section>
+            <section class="analysis">
+              <div class="section-heading">
+                <h2>优先处置</h2>
+                <span id="slaCount" class="pill"></span>
+              </div>
+              <div id="priorities"></div>
+            </section>
+            <section class="analysis">
+              <div class="section-heading">
+                <h2>客源线索</h2>
+                <span class="muted small">仅采用明确自述</span>
+              </div>
+              <div id="origins"></div>
+            </section>
+          </div>
+          <div class="section-heading workflow-heading">
+            <h2>处置进度</h2>
+            <span class="muted small">纳入跟进的反馈</span>
+          </div>
+          <div id="workflow" class="workflow"></div>
+        </section>
+        <section data-section="feedback" hidden>
+          <div class="feedback-actions">
+            <div class="segmented" id="scopeTabs" aria-label="反馈范围">
+              <button data-scope="all" class="active">全部反馈</button
+              ><button data-scope="risk">负面预警</button
+              ><button data-scope="inquiry">用户咨询</button
+              ><button data-scope="positive">正面反馈</button>
+            </div>
+            <div class="button-group">
+              <button class="button" id="briefBtn">
+                <i data-lucide="clipboard-copy"></i>生成简报</button
+              ><button
+                class="icon-button"
+                id="csvBtn"
+                title="导出当前列表"
+                aria-label="导出当前列表"
+              >
+                <i data-lucide="file-down"></i>
+              </button>
+            </div>
+          </div>
+          <div class="filter-bar">
+            <div class="search-box">
+              <i data-lucide="search"></i
+              ><input
+                id="query"
+                type="search"
+                placeholder="搜索内容、账号、关键词"
+                aria-label="搜索反馈"
+              />
+            </div>
+            <select id="platformFilter" aria-label="平台筛选"></select
+            ><select id="levelFilter" aria-label="风险等级">
+              <option value="all">全部风险</option>
+              <option>红色</option>
+              <option>橙色</option>
+              <option>黄色</option>
+              <option>普通</option></select
+            ><select id="statusFilter" aria-label="处置状态">
+              <option value="all">全部状态</option>
+              <option>待研判</option>
+              <option>已派单</option>
+              <option>处理中</option>
+              <option>已回复</option>
+              <option>已复盘</option></select
+            ><select id="verificationFilter" aria-label="核验状态">
+              <option value="all">全部核验</option>
+              <option value="pending">待核验</option>
+              <option value="verified">已核验</option></select
+            ><label class="check"
+              ><input id="pendingFilter" type="checkbox" />仅待处理</label
+            >
+          </div>
+          <div class="list-meta">
+            <span id="listMeta"></span
+            ><button class="text-button" id="clearFilters">
+              重置筛选<i data-lucide="rotate-ccw"></i>
+            </button>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>内容与来源</th>
+                  <th>平台 / 时间</th>
+                  <th>研判</th>
+                  <th>互动</th>
+                  <th>处置 / 时限</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="feedbackRows"></tbody>
+            </table>
+          </div>
+          <div id="feedbackMobile" class="mobile-list"></div>
+          <div id="listEmpty" class="empty" hidden></div>
+          <div class="pagination">
+            <span id="pageMeta"></span>
+            <div class="button-group">
+              <button
+                class="icon-button"
+                id="prevPage"
+                title="上一页"
+                aria-label="上一页"
+              >
+                <i data-lucide="chevron-left"></i></button
+              ><button
+                class="icon-button"
+                id="nextPage"
+                title="下一页"
+                aria-label="下一页"
+              >
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+        <section data-section="coverage" hidden>
+          <div class="section-heading">
+            <h2>平台数据覆盖</h2>
+            <button class="button" id="templateBtn">
+              <i data-lucide="file-spreadsheet"></i>下载导入模板
+            </button>
+          </div>
+          <div id="sources" class="source-list"></div>
+          <div class="section-heading"><h2>导入记录</h2></div>
+          <div id="batches"></div>
+        </section>
+        <section data-section="settings" hidden>
+          <div class="section-heading">
+            <h2>监测对象</h2>
+            <button class="button primary" id="addPropertyBtn">
+              <i data-lucide="plus"></i>新增对象
+            </button>
+          </div>
+          <div id="propertyList"></div>
+        </section>
+      </main>
+      <footer>
+        旅声 · 酒旅舆情监测与预警系统<span>当前结果仅代表已收录样本</span>
+      </footer>
+    </div>
+    <input
+      type="file"
+      id="importFile"
+      accept=".json,.csv,application/json,text/csv"
+      hidden
+    />
+    <dialog id="detailDialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">反馈详情</p>
+          <h2 id="detailTitle"></h2>
+        </div>
+        <button
+          class="icon-button"
+          data-close="detailDialog"
+          title="关闭"
+          aria-label="关闭详情"
+        >
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div id="detailBody"></div>
+    </dialog>
+    <dialog id="propertyDialog">
+      <form id="propertyForm">
+        <div class="dialog-heading">
+          <h2 id="propertyDialogTitle">新增监测对象</h2>
+          <button
+            type="button"
+            class="icon-button"
+            data-close="propertyDialog"
+            title="关闭"
+            aria-label="关闭"
+          >
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="form-grid">
+          <label>名称<input name="name" maxlength="80" required /></label
+          ><label
+            >类型<select name="kind">
+              <option value="hotel">酒店</option>
+              <option value="homestay">民宿</option>
+              <option value="attraction">景区</option>
+            </select></label
+          ><label>所在城市<input name="city" maxlength="40" required /></label
+          ><label
+            >监测关键词<input
+              name="aliases"
+              maxlength="300"
+              placeholder="全称、简称、店名" /></label
+          ><label class="full"
+            >责任团队<input
+              name="owners"
+              maxlength="300"
+              value="值班经理、前厅部、客房部、市场运营" /></label
+          ><label
+            >红色处置时限（小时）<input
+              name="redHours"
+              type="number"
+              min="0.5"
+              max="168"
+              step="0.5"
+              value="1"
+              required /></label
+          ><label
+            >橙色处置时限（小时）<input
+              name="orangeHours"
+              type="number"
+              min="0.5"
+              max="168"
+              step="0.5"
+              value="2"
+              required /></label
+          ><label
+            >黄色处置时限（小时）<input
+              name="yellowHours"
+              type="number"
+              min="0.5"
+              max="168"
+              step="0.5"
+              value="24"
+              required
+          /></label>
+        </div>
+        <div class="dialog-footer">
+          <button class="button primary" type="submit">保存对象</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="briefDialog">
+      <div class="dialog-heading">
+        <h2>舆情简报</h2>
+        <button
+          class="icon-button"
+          data-close="briefDialog"
+          title="关闭"
+          aria-label="关闭"
+        >
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <textarea id="briefText" readonly aria-label="舆情简报"></textarea>
+      <div class="dialog-footer">
+        <button class="button" id="briefDownload">
+          <i data-lucide="download"></i>下载简报
+        </button>
+      </div>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+    <script src="assets/lucide.min.js"></script>
+    <script src="assets/papaparse.min.js"></script>
+    <script src="data.seed.js"></script>
+    <script
+      src="data.local.js"
+      onerror="window.TRAVEL_PULSE_LOCAL=null"
+    ></script>
+    <script src="core.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

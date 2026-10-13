@@ -1,0 +1,16 @@
+data.local.js
+data/
+private/
+qa/
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+MediaCrawler/
+browser_data/
+*user_data_dir/
+.venv/
+config.local.json
+.github/workflows/test.yml

@@ -1,0 +1,14 @@
+{
+  "name": "hospitality-reputation-monitor",
+  "version": "2.0.0",
+  "private": true,
+  "description": "旅声 - 酒店、民宿与景区舆情监测及预警工作台",
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "build:data": "node scripts/build-data.cjs",
+    "check:release": "node scripts/check-release.cjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
