@@ -7,6 +7,8 @@ node_modules/
 .env.*
 !.env.example
 *.log
+*.zip
+*.ZIP
 .DS_Store
 MediaCrawler/
 browser_data/

@@ -13,6 +13,7 @@
     "百度地图",
     "高德地图",
     "视频号",
+    "门店反馈",
   ];
   const STATUSES = ["待研判", "已派单", "处理中", "已回复", "已复盘"];
   const LEVELS = ["红色", "橙色", "黄色", "普通"];
@@ -265,21 +266,25 @@
       n = Number(value);
       if (n < 100000000000) n *= 1000;
     } else {
-      let text = String(value).trim().replace(/\//g, "-");
+      const raw = String(value).trim().replace(/\//g, "-");
+      const m = raw.match(
+        /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2})(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?)?$/,
+      );
+      if (!m) return null;
+      const y = Number(m[1]),
+        month = Number(m[2]),
+        day = Number(m[3]);
+      const check = new Date(Date.UTC(y, month - 1, day));
       if (
-        /^\d{4}-\d{1,2}-\d{1,2}(?:[ T]\d{1,2}:\d{2}(?::\d{2})?)?$/.test(text)
-      ) {
-        const parts = text.split(/[ T]/);
-        text =
-          parts[0]
-            .split("-")
-            .map((v, i) => (i ? v.padStart(2, "0") : v))
-            .join("-") +
-          "T" +
-          (parts[1] || "00:00:00");
-        if (/T\d{1,2}:\d{2}$/.test(text)) text += ":00";
-        text += "+08:00";
-      }
+        check.getUTCFullYear() !== y ||
+        check.getUTCMonth() !== month - 1 ||
+        check.getUTCDate() !== day ||
+        Number(m[4] || 0) > 23 ||
+        Number(m[5] || 0) > 59 ||
+        Number(m[6] || 0) > 59
+      )
+        return null;
+      const text = `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}T${(m[4] || "00").padStart(2, "0")}:${m[5] || "00"}:${m[6] || "00"}${m[7] || ""}${m[8] || "+08:00"}`;
       n = Date.parse(text);
     }
     return Number.isFinite(n) && n > 0 ? n : null;
@@ -360,7 +365,7 @@
   function classify(text, p, rating = null) {
     const value = clean(text);
     const positiveContext = value.replace(
-      /(?:不|别|避免)踩[雷坑]|避[雷坑](?:攻略|指南)|别错过|不要错过|不容错过|值不值得/g,
+      /(?:不|别|避免)踩[雷坑]|避[雷坑](?:攻略|指南)|别错过|不要错过|不容错过|值不值得|(?:没有|未发现|未发生|不存在)(?:偷拍|火灾|受伤|触电|溺水|食物中毒)/g,
       "",
     );
     const rule = rules.find(
@@ -523,9 +528,11 @@
     ];
     if (!known.includes(city.replace(/市$/, "")))
       return { type: "未识别", city: "", evidence: "自述未匹配可识别的城市" };
+    const normalizedCity = city.replace(/市$/, "");
     return {
-      type: city === p.city ? "疑似本地" : "疑似外地",
-      city,
+      type:
+        normalizedCity === p.city.replace(/市$/, "") ? "疑似本地" : "疑似外地",
+      city: normalizedCity,
       evidence: m[0],
     };
   }
@@ -587,6 +594,13 @@
           }
         : {}),
       assessmentMode: supplied ? "manual" : "rules",
+      publishedPrecision:
+        raw.publishedPrecision ||
+        (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(
+          String(raw.publishedAt ?? raw.timestamp),
+        )
+          ? "day"
+          : "minute"),
       rating: ratingNumber,
       metrics: {
         likes: count(raw.metrics?.likes ?? raw.likes),
@@ -625,12 +639,22 @@
       const older = newer === r ? old : r;
       map.set(r.id, {
         ...newer,
-        firstSeenAt:
-          Math.min(...[old.firstSeenAt, r.firstSeenAt].filter(Boolean)) || null,
+        firstSeenAt: [old.firstSeenAt, r.firstSeenAt]
+          .filter(Number.isFinite)
+          .filter((v) => v > 0).length
+          ? Math.min(
+              ...[old.firstSeenAt, r.firstSeenAt]
+                .filter(Number.isFinite)
+                .filter((v) => v > 0),
+            )
+          : null,
         mediaPreview: newer.mediaPreview || older.mediaPreview,
         sourceUrl: newer.sourceUrl || older.sourceUrl,
         verification:
-          old.verification === "verified" || r.verification === "verified"
+          newer.verification === "verified" ||
+          (older.verification === "verified" &&
+            newer.content === older.content &&
+            newer.sourceUrl === older.sourceUrl)
             ? "verified"
             : "pending",
       });
@@ -699,6 +723,7 @@
   function inRange(r, range, now) {
     if (range === "all") return true;
     if (!r.publishedAt || r.publishedAt > now) return false;
+    if (range === "24h" && r.publishedPrecision === "day") return false;
     const ms = { "24h": 86400000, "7d": 7 * 86400000, "30d": 30 * 86400000 }[
       range
     ];
@@ -760,6 +785,7 @@
     for (const r of records) {
       if (
         !r.publishedAt ||
+        r.publishedPrecision === "day" ||
         r.publishedAt < now - 86400000 ||
         r.publishedAt > now
       )
@@ -781,6 +807,11 @@
       throw new Error("派单前请填写负责人");
     if (["已回复", "已复盘"].includes(patch.status) && !clean(patch.reply))
       throw new Error("请先记录实际回复或处置结果");
+    if (
+      ["已回复", "已复盘"].includes(patch.status) &&
+      /【(?:填写|核实|待)/.test(patch.reply)
+    )
+      throw new Error("请先用真实处理结果替换回复草稿中的待核实项");
     if (patch.status === "已复盘" && !clean(patch.review))
       throw new Error("请填写复盘结果");
     return {
@@ -796,6 +827,9 @@
       riskLevel: LEVELS.includes(patch.riskLevel)
         ? patch.riskLevel
         : r.riskLevel,
+      riskScore: { 红色: 90, 橙色: 74, 黄色: 45, 普通: 0 }[
+        LEVELS.includes(patch.riskLevel) ? patch.riskLevel : r.riskLevel
+      ],
       assessmentMode: "manual",
     };
   }

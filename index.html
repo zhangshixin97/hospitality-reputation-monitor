@@ -4,17 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
-    <title>旅声 · 酒旅舆情监测与预警系统</title>
+    <title>旅声 · 酒旅舆情监控与预警系统</title>
     <link rel="icon" href="assets/brand.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="brand.css" />
+    <link rel="stylesheet" href="dashboard.css" />
   </head>
   <body>
     <aside class="sidebar">
       <a class="brand" href="#overview"
-        ><img src="assets/brand.svg" alt="" /><span
-          >旅声<small>酒旅舆情工作台</small></span
-        ></a
+        ><span class="brand-title">旅声<small>酒旅舆情工作台</small></span></a
       >
+      <div class="brand-signature">
+        张世鑫<span class="blue-dot" aria-hidden="true"></span>AI<small
+          >开源项目</small
+        >
+      </div>
       <nav aria-label="工作台导航">
         <button data-view="overview" class="nav active">
           <i data-lucide="layout-dashboard"></i>整体概览
@@ -27,6 +32,9 @@
         <button data-view="coverage" class="nav">
           <i data-lucide="radio"></i>数据来源
         </button>
+        <button data-view="review" class="nav">
+          <i data-lucide="notebook-pen"></i>运营复盘
+        </button>
         <button data-view="settings" class="nav">
           <i data-lucide="building-2"></i>监测对象
         </button>
@@ -35,6 +43,13 @@
         <span class="dot"></span>本地工作空间<small id="saveStatus"
           >处置记录保存在此浏览器</small
         >
+        <p class="motto">把 AI 变成店里最得力的员工</p>
+        <a
+          href="https://zhangshixin97.github.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          >张世鑫个人网站<i data-lucide="arrow-up-right"></i
+        ></a>
       </div>
     </aside>
     <div class="workspace">
@@ -44,6 +59,9 @@
           ><select id="propertyFilter" aria-label="监测对象"></select>
         </div>
         <div class="top-actions">
+          <button class="button" id="addFeedbackBtn">
+            <i data-lucide="plus"></i><span>登记反馈</span>
+          </button>
           <span id="clockLabel"></span
           ><button
             class="icon-button"
@@ -63,10 +81,21 @@
         </div>
       </header>
       <main>
+        <div class="product-heading">
+          <h1>酒旅舆情监控<wbr />与预警系统</h1>
+          <span>旅声 · 张世鑫AI开源项目</span>
+        </div>
+        <div id="demoBanner" class="demo-banner" hidden>
+          <span
+            ><b>模拟演示</b> ·
+            数据、账号与处置均为虚构，不计入真实工作空间。</span
+          ><button class="button" id="exitDemoBtn">退出演示</button>
+        </div>
+        <div id="loadError" class="load-error" hidden></div>
         <div class="page-heading">
           <div>
             <p class="eyebrow" id="propertyKind">酒旅运营</p>
-            <h1 id="pageTitle">整体概览</h1>
+            <h2 id="pageTitle">整体概览</h2>
             <p id="pageSubtitle" class="muted"></p>
           </div>
           <div class="range-control">
@@ -82,7 +111,63 @@
         </div>
         <div class="coverage-notice" id="freshness" role="status"></div>
         <section data-section="overview">
+          <div class="intro-empty" id="onboarding" hidden>
+            <div>
+              <h2>从门店反馈开始</h2>
+              <p>酒店、民宿、景区 · 先核对来源，再记录处置。</p>
+            </div>
+            <div class="empty-commands">
+              <button class="button primary" data-open="feedbackFormDialog">
+                <i data-lucide="plus"></i>登记反馈</button
+              ><button class="button" id="emptyImportBtn">
+                <i data-lucide="upload"></i>导入数据</button
+              ><button class="button" id="demoBtn">
+                <i data-lucide="play"></i>体验示例
+              </button>
+            </div>
+          </div>
+          <div id="dutyFocus" class="focus-band"></div>
           <div class="stats-grid" id="stats"></div>
+          <div class="quality-strip" id="qualityStrip"></div>
+          <section
+            id="monitorBoard"
+            class="monitor-board"
+            aria-label="舆情监控大盘"
+          >
+            <div class="board-heading">
+              <div>
+                <h2>舆情监控大盘</h2>
+                <p id="boardScope"></p>
+              </div>
+              <div class="button-group">
+                <span class="pill" id="boardMode"></span
+                ><button
+                  class="icon-button"
+                  id="fullscreenBoard"
+                  title="大盘全屏"
+                  aria-label="大盘全屏"
+                >
+                  <i data-lucide="maximize-2"></i>
+                </button>
+              </div>
+            </div>
+            <div class="board-grid">
+              <div class="board-chart-wrap">
+                <div class="board-axis-labels">
+                  <span>平台来源</span><span>情感反馈</span
+                  ><span>处置状态</span>
+                </div>
+                <div id="monitorChart" class="monitor-chart" role="img"></div>
+                <p id="boardEmpty" class="board-empty" hidden>
+                  当前范围暂无反馈样本
+                </p>
+              </div>
+              <div class="board-metrics" id="boardMetrics"></div>
+            </div>
+            <div class="board-footer">
+              <span id="boardCoverage"></span><span>按已收录反馈统计</span>
+            </div>
+          </section>
           <div class="section-heading">
             <h2>平台反馈</h2>
             <button class="text-button" data-go="coverage">
@@ -105,6 +190,10 @@
               </div>
               <div id="hourChart" class="hour-chart" role="img"></div>
               <div class="chart-labels" id="hourLabels"></div>
+              <div class="chart-legend">
+                <span><i class="legend-square"></i>反馈</span
+                ><span><i class="legend-square red"></i>含负面反馈</span>
+              </div>
             </section>
             <section class="analysis">
               <div class="section-heading">
@@ -161,6 +250,7 @@
             <select id="platformFilter" aria-label="平台筛选"></select
             ><select id="levelFilter" aria-label="风险等级">
               <option value="all">全部风险</option>
+              <option value="high">红橙风险</option>
               <option>红色</option>
               <option>橙色</option>
               <option>黄色</option>
@@ -171,11 +261,17 @@
               <option>已派单</option>
               <option>处理中</option>
               <option>已回复</option>
-              <option>已复盘</option></select
+              <option>已复盘</option>
+              <option value="none">无需跟进</option></select
             ><select id="verificationFilter" aria-label="核验状态">
               <option value="all">全部核验</option>
               <option value="pending">待核验</option>
               <option value="verified">已核验</option></select
+            ><select id="sentimentFilter" aria-label="情感筛选">
+              <option value="all">全部情感</option>
+              <option>正面</option>
+              <option>中性</option>
+              <option>负面</option></select
             ><label class="check"
               ><input id="pendingFilter" type="checkbox" />仅待处理</label
             >
@@ -244,9 +340,40 @@
           </div>
           <div id="propertyList"></div>
         </section>
+        <section data-section="review" hidden>
+          <div class="review-grid" id="reviewMetrics"></div>
+          <div class="section-heading">
+            <h2>反复出现的问题</h2>
+            <span class="small muted">按风险主题聚合</span>
+          </div>
+          <div id="reviewTopics"></div>
+          <div class="section-heading">
+            <h2>整改台账</h2>
+            <button class="button primary" id="addActionBtn">
+              <i data-lucide="plus"></i>新增整改
+            </button>
+          </div>
+          <div id="actionList"></div>
+        </section>
       </main>
       <footer>
-        旅声 · 酒旅舆情监测与预警系统<span>当前结果仅代表已收录样本</span>
+        <span class="author-footer"
+          >张世鑫<span class="blue-dot" aria-hidden="true"></span>AI ·
+          旅声</span
+        ><span>仅代表已收录样本</span
+        ><span class="footer-links"
+          ><a
+            href="https://github.com/zhangshixin97/hospitality-reputation-monitor"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub / MIT</a
+          ><a
+            href="https://zhangshixin97.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            >个人网站</a
+          ></span
+        >
       </footer>
     </div>
     <input
@@ -271,6 +398,146 @@
         </button>
       </div>
       <div id="detailBody"></div>
+    </dialog>
+    <dialog id="feedbackFormDialog">
+      <form id="feedbackForm">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">反馈收录</p>
+            <h2>登记反馈</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            data-close="feedbackFormDialog"
+            title="关闭"
+            aria-label="关闭"
+          >
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="form-grid">
+          <label
+            >平台<select name="platform" id="manualPlatform"></select></label
+          ><label
+            >类型<select name="recordKind">
+              <option value="comment">点评 / 评论</option>
+              <option value="content">帖子 / 视频</option>
+            </select></label
+          ><label class="full"
+            >反馈正文<textarea
+              name="content"
+              maxlength="12000"
+              required
+            ></textarea></label
+          ><label>来源标识<input name="sourceId" maxlength="150" /></label
+          ><label>来源账号<input name="sourceAccount" maxlength="80" /></label
+          ><label
+            >发布时间<input name="publishedAt" type="datetime-local" /></label
+          ><label
+            >评分（5分制）<input
+              name="rating"
+              type="number"
+              min="0"
+              max="5"
+              step="0.1" /></label
+          ><label class="full"
+            >原内容链接<input
+              name="sourceUrl"
+              type="url"
+              maxlength="2500" /></label
+          ><label class="full"
+            >证据备注<textarea name="evidenceNote" maxlength="600"></textarea>
+          </label>
+        </div>
+        <p class="compact-note">
+          发布时间不明可留空，收录时间记录本次登记时间。
+        </p>
+        <div class="dialog-footer">
+          <button class="button primary" type="submit">
+            <i data-lucide="save"></i>保存反馈
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="importDialog">
+      <div class="dialog-heading">
+        <div>
+          <p class="eyebrow">批量收录</p>
+          <h2>确认导入</h2>
+        </div>
+        <button
+          class="icon-button"
+          data-close="importDialog"
+          title="关闭"
+          aria-label="关闭"
+        >
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <p id="importFilename" class="import-info"></p>
+      <label id="importPlatformLabel" class="import-info" hidden
+        >文件没有平台列<select id="importPlatform">
+          <option value="">选择来源平台</option>
+        </select></label
+      >
+      <div id="importPreview"></div>
+      <div class="dialog-footer">
+        <button class="button" data-close="importDialog">取消</button
+        ><button class="button primary" id="confirmImportBtn">
+          <i data-lucide="check"></i>确认导入
+        </button>
+      </div>
+    </dialog>
+    <dialog id="actionDialog">
+      <form id="actionForm">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">运营复盘</p>
+            <h2>整改事项</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-close="actionDialog"
+            title="关闭"
+            aria-label="关闭"
+          >
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="form-grid">
+          <label class="full"
+            >整改事项<input name="title" maxlength="300" required /></label
+          ><label>问题主题<input name="topic" maxlength="80" required /></label
+          ><label
+            >负责人<input
+              name="owner"
+              maxlength="80"
+              required
+              list="actionOwners" /></label
+          ><label
+            >截止时间<input
+              name="dueAt"
+              type="datetime-local"
+              required /></label
+          ><label
+            >状态<select name="status">
+              <option>待整改</option>
+              <option>整改中</option>
+              <option>已完成</option>
+            </select></label
+          ><label class="full"
+            >整改结果<textarea name="result" maxlength="4000"></textarea>
+          </label>
+        </div>
+        <datalist id="actionOwners"></datalist>
+        <div class="dialog-footer">
+          <button class="button primary" type="submit">
+            <i data-lucide="save"></i>保存整改
+          </button>
+        </div>
+      </form>
     </dialog>
     <dialog id="propertyDialog">
       <form id="propertyForm">
@@ -361,12 +628,17 @@
     <div class="toast" id="toast" role="status" hidden></div>
     <script src="assets/lucide.min.js"></script>
     <script src="assets/papaparse.min.js"></script>
+    <script src="assets/echarts.min.js"></script>
     <script src="data.seed.js"></script>
     <script
       src="data.local.js"
       onerror="window.TRAVEL_PULSE_LOCAL=null"
     ></script>
     <script src="core.js"></script>
+    <script src="workspace.js"></script>
+    <script src="importer.js"></script>
+    <script src="operations.js"></script>
+    <script src="demo.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

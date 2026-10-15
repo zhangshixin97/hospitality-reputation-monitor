@@ -1,0 +1,379 @@
+body {
+  font-size: 16px;
+}
+.product-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 24px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.product-heading h1 {
+  font-size: 32px;
+  line-height: 1.35;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+.product-heading > span {
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.page-heading #pageTitle {
+  font-size: 22px;
+  font-weight: 700;
+}
+.page-heading .muted {
+  font-size: 14px;
+}
+.nav {
+  font-size: 14px;
+}
+.stat-label {
+  font-size: 14px;
+}
+.stat-note {
+  font-size: 12px;
+}
+.stat-value {
+  font-size: 34px;
+}
+.platform-name {
+  font-size: 15px;
+}
+.platform {
+  min-height: 168px;
+}
+.platform-total {
+  font-size: 25px;
+}
+.sentiment-counts {
+  font-size: 12px;
+  flex-wrap: wrap;
+  gap: 4px 7px;
+}
+.sentiment-counts span {
+  white-space: nowrap;
+}
+.priority p {
+  font-size: 14px;
+}
+.priority .muted {
+  font-size: 12px;
+}
+.topic-row,
+.origin-row {
+  font-size: 14px;
+}
+.quality-strip {
+  font-size: 12px;
+}
+.filter-bar select,
+.search-box input {
+  font-size: 14px;
+}
+table {
+  font-size: 14px;
+}
+.content-main p {
+  font-size: 14px;
+  line-height: 1.75;
+}
+.source-line {
+  font-size: 12px;
+}
+.cell-sub {
+  font-size: 12px;
+}
+.segmented button {
+  font-size: 14px;
+}
+.list-meta {
+  font-size: 13px;
+}
+.button {
+  font-size: 14px;
+}
+.form-grid label,
+.detail-section p,
+.evidence-data {
+  font-size: 14px;
+}
+.form-grid textarea {
+  font-size: 14px;
+}
+.review-row p,
+.action-row p {
+  font-size: 13px;
+}
+.source-row p {
+  font-size: 13px;
+}
+.coverage-notice {
+  font-size: 13px;
+}
+.source-row strong {
+  font-size: 15px;
+}
+.monitor-board {
+  margin-top: 25px;
+  border-top: 2px solid var(--brand);
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  padding: 22px 24px;
+}
+.board-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+.board-heading h2 {
+  font-size: 21px;
+}
+.board-heading p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.board-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 175px;
+  gap: 30px;
+  margin-top: 18px;
+}
+.board-chart-wrap {
+  position: relative;
+  min-width: 0;
+}
+.board-axis-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.monitor-chart {
+  width: 100%;
+  height: 330px;
+  min-width: 0;
+  overflow: hidden;
+}
+.board-metrics {
+  border-left: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding-left: 24px;
+  gap: 12px;
+}
+.board-metric {
+  border: 0;
+  padding: 4px 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.board-metric span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.board-metric strong {
+  display: block;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 29px;
+  margin: 5px 0;
+  line-height: 1.2;
+}
+.board-metric small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+}
+.board-metric.alert strong {
+  color: var(--orange);
+}
+.board-metric.negative strong {
+  color: var(--red);
+}
+.board-empty {
+  position: absolute;
+  top: 44%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+.board-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.monitor-board:fullscreen {
+  background: #f6f7f9;
+  overflow: auto;
+  padding: 35px;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+}
+.monitor-board:fullscreen .board-grid {
+  flex: 1;
+  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) 240px;
+}
+.monitor-board:fullscreen .monitor-chart {
+  height: calc(100vh - 200px);
+  min-height: 320px;
+}
+.monitor-board:fullscreen .board-heading h2 {
+  font-size: 27px;
+}
+.monitor-board:fullscreen .board-metric strong {
+  font-size: 40px;
+}
+@media (max-width: 1150px) {
+  .product-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .board-grid {
+    grid-template-columns: minmax(0, 1fr) 135px;
+    gap: 18px;
+  }
+  .board-metrics {
+    padding-left: 18px;
+  }
+  .board-metric strong {
+    font-size: 26px;
+  }
+}
+@media (max-width: 800px) {
+  body {
+    font-size: 15px;
+  }
+  .product-heading {
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    gap: 6px;
+  }
+  .product-heading h1 {
+    font-size: 27px;
+    line-height: 1.45;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .product-heading > span {
+    font-size: 12px;
+  }
+  .page-heading #pageTitle {
+    font-size: 20px;
+  }
+  .page-heading .muted {
+    font-size: 13px;
+  }
+  .nav {
+    font-size: 12px;
+  }
+  .brand-signature {
+    font-size: 13px;
+  }
+  .stat-label {
+    font-size: 13px;
+  }
+  .stat-value {
+    font-size: 30px;
+  }
+  .stat-note {
+    font-size: 12px;
+  }
+  .platform {
+    padding: 14px;
+    min-height: 175px;
+  }
+  .sentiment-counts {
+    font-size: 12px;
+  }
+  .coverage-notice {
+    font-size: 12px;
+  }
+  .quality-strip {
+    font-size: 12px;
+  }
+  .segmented button {
+    font-size: 13px;
+  }
+  .monitor-board {
+    padding: 18px 12px;
+    margin-top: 22px;
+  }
+  .board-heading {
+    align-items: flex-start;
+  }
+  .board-heading h2 {
+    font-size: 18px;
+  }
+  .board-heading p {
+    font-size: 11px;
+  }
+  .board-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .monitor-chart {
+    height: 390px;
+  }
+  .board-axis-labels {
+    font-size: 11px;
+    padding: 0 8px;
+  }
+  .board-metrics {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 13px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .board-metric strong {
+    font-size: 24px;
+  }
+  .board-footer {
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 15px;
+    font-size: 11px;
+  }
+  .monitor-board:fullscreen {
+    padding: 18px;
+  }
+  .monitor-board:fullscreen .board-grid {
+    grid-template-columns: 1fr;
+  }
+  .monitor-board:fullscreen .monitor-chart {
+    height: 390px;
+    min-height: 320px;
+  }
+  .monitor-board:fullscreen .board-heading h2 {
+    font-size: 21px;
+  }
+  .monitor-board:fullscreen .board-metric strong {
+    font-size: 27px;
+  }
+  .content-main p {
+    font-size: 14px;
+  }
+  .form-grid label {
+    font-size: 14px;
+  }
+}
